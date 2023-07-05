@@ -40,6 +40,18 @@ setup(
             # To be added
             # 'turtlebot3_interactive_marker = \
             #   turtlebot3_example.turtlebot3_interactive_marker.main:main',
+            'simple_marker = \
+                turtlebot3_example.simple_marker.simple_marker:main',
+            'turtlebot3_obstacle_detection_stop = \
+                turtlebot3_example.turtlebot3_obstacle_detection.turtlebot3_obstacle_detection_stop.main:main',
+            'turtlebot3_client = \
+                turtlebot3_example.turtlebot3_action.turtlebot3_client:main',
+            'turtlebot3_server = \
+                turtlebot3_example.turtlebot3_action.turtlebot3_server:main',
+            'turtlebot3_point_to_key = \
+                turtlebot3_example.turtlebot3_position_control.turtlebot3_pointop_key:main',
+            
+            
             'turtlebot3_obstacle_detection = \
                 turtlebot3_example.turtlebot3_obstacle_detection.main:main',
             'turtlebot3_patrol_client = \
