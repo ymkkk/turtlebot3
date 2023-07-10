@@ -44,7 +44,7 @@ class Turtlebot3Server(Node):
         self.position = Point()
         self.rotation = 0.0
 
-        self.linear_x = 0.2
+        self.linear_x = 0.05
         self.angular_z = 0.2
 
         self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)

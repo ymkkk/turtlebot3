@@ -34,7 +34,7 @@ class Turtlebot3ObstacleDetectionStop(Node):
         self.has_scan_gotten = False
 
         self.stop_distance = 0.3  # m
-        self.linear_vel = 0.3
+        self.linear_vel = 0.05  # m/s
         
         qos = QoSProfile(depth=10)
 

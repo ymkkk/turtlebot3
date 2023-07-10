@@ -39,7 +39,7 @@ class Turtlebot3PointOpKey(Node):
         self.heading_error = 0.0 
 
         self.angular_speed = 0.3
-        self.linear_speed = 1.0
+        self.linear_speed = 0.5
 
         self.get_key()
 
