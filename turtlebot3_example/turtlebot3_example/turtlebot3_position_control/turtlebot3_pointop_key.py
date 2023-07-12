@@ -114,21 +114,16 @@ class Turtlebot3PointOpKey(Node):
 
         self.get_logger().info(str(self.goal_position.x) + str(self.goal_position.y) + str(self.goal_heading))
 
-    def transfrom_from_quaternion_to_eular(self, quaternion):
-        x = quaternion.x
-        y = quaternion.y
-        z = quaternion.z
-        w = quaternion.w
-
-        sinr_cosp = 2.0 * (w * x + y * z)
-        cosr_cosp = 1.0 - 2.0 * (x * x + y * y)
+    def transfrom_from_quaternion_to_eular(self, q):
+        sinr_cosp = 2.0 * (q.w * q.x + q.y * q.z)
+        cosr_cosp = 1.0 - 2.0 * (q.x * q.x + q.y * q.y)
         roll = numpy.arctan2(sinr_cosp, cosr_cosp)
 
-        sinp = 2.0 * (w * y - z * x)
+        sinp = 2.0 * (q.w * q.y - q.z * q.x)
         pitch = numpy.arcsin(sinp)
 
-        siny_cosp = 2.0 * (w * z + x * y)
-        cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
+        siny_cosp = 2.0 * (q.w * q.z + q.x * q.y)
+        cosy_cosp = 1.0 - 2.0 * (q.y * q.y + q.z * q.z)
         yaw = numpy.arctan2(siny_cosp, cosy_cosp)
 
         return roll, pitch, yaw
