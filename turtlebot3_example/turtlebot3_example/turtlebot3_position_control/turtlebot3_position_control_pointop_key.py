@@ -1,7 +1,6 @@
-
 #!/usr/bin/env python3
 #
-# Copyright 2019 ROBOTIS CO., LTD.
+# Copyright 2023 ROBOTIS CO., LTD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,19 +16,21 @@
 #
 # Authors: Jeonggeun Lim, Gilbert
 
+
 import rclpy
 from rclpy.node import Node
 import numpy
 import math
 
+from rclpy.qos import QoSProfile
 from geometry_msgs.msg import Twist, Point
 from nav_msgs.msg import Odometry
 
 
-class Turtlebot3PointOpKey(Node):
+class Turtlebot3PositionControlPointOpKey(Node):
 
     def __init__(self):
-        super().__init__('turtlebot3_pointop_key')
+        super().__init__('turtlebot3_position_control_pointop_key')
         
         self.goal_position = Point()
         self.goal_heading = 0.0
@@ -43,7 +44,9 @@ class Turtlebot3PointOpKey(Node):
 
         self.get_key()
 
-        self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        qos = QoSProfile(depth=10)
+
+        self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', qos)
         self.cmd_vel = Twist()
 
         self.odom_sub = self.create_subscription(
@@ -78,6 +81,11 @@ class Turtlebot3PointOpKey(Node):
                 self.cmd_vel.angular.z = min(self.cmd_vel.angular.z, 1.5)
             else:
                 self.cmd_vel.angular.z = max(self.cmd_vel.angular.z, -1.5)
+
+            self.get_logger().info("goal x,y: {:.2f}, {:.2f}, robot x,y: {:.2f}, {:.2f}".format( \
+                self.goal_position.x, self.goal_position.y, \
+                self.position.x, self.position.y))
+
             self.cmd_vel_pub.publish(self.cmd_vel)   
         else:
             self.heading_error = self.goal_heading - self.heading
@@ -90,10 +98,18 @@ class Turtlebot3PointOpKey(Node):
             self.cmd_vel.linear.x = 0.0
             self.cmd_vel.angular.z = self.heading_error
 
+            self.get_logger().info("goal heading: {:.2f}, robot heading: {:.2f}".format( \
+                self.goal_heading * 180.0 / math.pi, self.heading * 180.0 / math.pi))
+
             if abs(self.heading_error * 180.0 / math.pi) < 1.0:
                 self.cmd_vel.linear.x = 0.0
                 self.cmd_vel.angular.z = 0.0
+                self.cmd_vel_pub.publish(self.cmd_vel)
+
+                self.get_logger().info("goal heading: {:.2f}, robot heading: {:.2f}".format( \
+                    self.goal_heading * 180.0 / math.pi, self.heading * 180.0 / math.pi))
                 rclpy.shutdown()
+                
                 
         self.cmd_vel_pub.publish(self.cmd_vel)
 
@@ -112,8 +128,9 @@ class Turtlebot3PointOpKey(Node):
             self.goal_heading = -(-self.goal_heading % (math.pi * 180.0 / math.pi))
         self.goal_heading = self.goal_heading * math.pi / 180.0
 
-        self.get_logger().info(str(self.goal_position.x) + str(self.goal_position.y) + str(self.goal_heading))
-
+        self.get_logger().info("goal position xy: {:.2f}, {:.2f}, goal heading: {:.2f}".format( \
+            self.goal_position.x, self.goal_position.y, self.goal_heading * 180.0 / math.pi))
+ 
     def transfrom_from_quaternion_to_eular(self, q):
         sinr_cosp = 2.0 * (q.w * q.x + q.y * q.z)
         cosr_cosp = 1.0 - 2.0 * (q.x * q.x + q.y * q.y)
@@ -130,10 +147,10 @@ class Turtlebot3PointOpKey(Node):
 
 def main(args=None):
     rclpy.init()
-    turtlebot3_pointop_key = Turtlebot3PointOpKey()
-    rclpy.spin(turtlebot3_pointop_key)
+    turtlebot3_position_control_pointop_key = Turtlebot3PositionControlPointOpKey()
+    rclpy.spin(turtlebot3_position_control_pointop_key)
 
-    turtlebot3_pointop_key.destroy_node()
+    turtlebot3_position_control_pointop_key.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':

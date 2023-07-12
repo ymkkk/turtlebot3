@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2019 ROBOTIS CO., LTD.
+# Copyright 2023 ROBOTIS CO., LTD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #
 # Authors: Jeonggeun Lim, Gilbert
 
+
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
@@ -23,10 +24,10 @@ from rclpy.node import Node
 from turtlebot3_msgs.action import Turtlebot3 
 
 
-class Turtlebot3Client(Node):
+class Turtlebot3PatrolClient(Node):
 
     def __init__(self):
-        super().__init__('turtlebot3_client')
+        super().__init__('turtlebot3_patrol_client')
         self._action_client = ActionClient(self, Turtlebot3, 'turtlebot3')
 
         self.mode = 1.0
@@ -46,10 +47,10 @@ class Turtlebot3Client(Node):
         elif mode == 't':
             mode = 2
         elif mode == 'x':
-            self.shutdown()
+            rclpy.shutdown()
         else:
             self.get_logger().info("you selected wrong mode") 
-            self.shutdown()
+            rclpy.shutdown()
 
         return mode, area, count
 
@@ -86,14 +87,12 @@ class Turtlebot3Client(Node):
         feedback = feedback_msg.feedback
         self.get_logger().info('Received feedback: {0}'.format(feedback.state))
 
-
 def main(args=None):
     rclpy.init(args=args)
 
-    action_client = Turtlebot3Client()
+    turtlebot3_patrol_client = Turtlebot3PatrolClient()
 
-    rclpy.spin(action_client)
-
+    rclpy.spin(turtlebot3_patrol_client)
 
 if __name__ == '__main__':
     main()

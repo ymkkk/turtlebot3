@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2019 ROBOTIS CO., LTD.
+# Copyright 2023 ROBOTIS CO., LTD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 #
 # Authors: Jeonggeun Lim, Gilbert
 
+
 import time
 import rclpy
 import math
 from rclpy.action import ActionServer
-from rclpy.node import Node
 from rclpy.action import GoalResponse
+from rclpy.node import Node
+from rclpy.qos import QoSProfile
 from rclpy.callback_groups import ReentrantCallbackGroup
 
 from geometry_msgs.msg import Twist, Point
 from turtlebot3_msgs.action import Turtlebot3
 
-class Turtlebot3Server(Node):
+class Turtlebot3PatrolServer(Node):
 
     def __init__(self):
-        super().__init__('turtlebot3_server')
+        super().__init__('turtlebot3_patrol_server')
         self._action_server = ActionServer(
             self,
             Turtlebot3,
@@ -44,10 +46,12 @@ class Turtlebot3Server(Node):
         self.position = Point()
         self.rotation = 0.0
 
-        self.linear_x = 0.05
-        self.angular_z = 0.2
+        self.linear_x = 0.2
+        self.angular_z = 0.5
 
-        self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        qos = QoSProfile(depth=10)
+
+        self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', qos)
         self.cmd_vel = Twist()
 
     def init_twist(self):
@@ -61,7 +65,6 @@ class Turtlebot3Server(Node):
             self.twist.angular.z = 0.0
             self.cmd_vel_pub.publish(self.twist)
             
-            # self.get_logger().info("position: " + str(position))
             position += self.twist.linear.x
             time.sleep(1)
         self.init_twist()
@@ -72,7 +75,6 @@ class Turtlebot3Server(Node):
             self.twist.angular.z = self.angular_z
             self.cmd_vel_pub.publish(self.twist)
 
-            # self.get_logger().info("angle: " + str(angle))
             angle += self.twist.angular.z
             time.sleep(1)
         self.init_twist()
@@ -93,10 +95,12 @@ class Turtlebot3Server(Node):
             if self.goal_msg.goal.x == 1:
                 for count in range(iteration):
                     self.square(feedback_msg, goal_handle, length)
+                feedback_msg.state = "square patrol complete!!"
                 break
             elif self.goal_msg.goal.x == 2:
                 for count in range(iteration):
                     self.triangle(feedback_msg, goal_handle, length)
+                feedback_msg.state = "triangle patrol complete!!"
                 break
 
         goal_handle.succeed()
@@ -113,7 +117,7 @@ class Turtlebot3Server(Node):
             self.go_front(self.position.x, length)
             self.turn(self.angle, 90.0)
 
-            feedback_msg.state = "step " + str(i)
+            feedback_msg.state = "line " + str(i + 1)
             goal_handle.publish_feedback(feedback_msg)
             time.sleep(1)
 
@@ -127,20 +131,18 @@ class Turtlebot3Server(Node):
             self.go_front(self.position.x, length)
             self.turn(self.angle, 120.0)
 
-            feedback_msg.state = "step " + str(i)
+            feedback_msg.state = "line " + str(i + 1)
             goal_handle.publish_feedback(feedback_msg)
             time.sleep(1)
 
         self.init_twist()
 
-
 def main(args=None):
     rclpy.init(args=args)
 
-    turtlebot3_server = Turtlebot3Server()
+    turtlebot3_patrol_server = Turtlebot3PatrolServer()
 
-    rclpy.spin(turtlebot3_server)
-
+    rclpy.spin(turtlebot3_patrol_server)
 
 if __name__ == '__main__':
     main()
