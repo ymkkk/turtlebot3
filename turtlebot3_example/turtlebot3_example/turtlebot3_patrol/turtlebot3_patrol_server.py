@@ -47,7 +47,7 @@ class Turtlebot3PatrolServer(Node):
         self.rotation = 0.0
 
         self.linear_x = 0.2
-        self.angular_z = 0.5
+        self.angular_z = 0.2
 
         qos = QoSProfile(depth=10)
 
@@ -60,22 +60,28 @@ class Turtlebot3PatrolServer(Node):
         self.cmd_vel_pub.publish(self.twist)
 
     def go_front(self, position, length):
-        while(position <= length):
-            self.twist.linear.x = self.linear_x
-            self.twist.angular.z = 0.0
-            self.cmd_vel_pub.publish(self.twist)
-            
-            position += self.twist.linear.x
+        position = 0
+        while(1):
+            if position < length:
+                self.twist.linear.x = self.linear_x
+                self.twist.angular.z = 0.0
+                self.cmd_vel_pub.publish(self.twist)
+            else:
+                break
+
             time.sleep(1)
         self.init_twist()
 
     def turn(self, angle, target_angle):
-        while (angle <= target_angle * math.pi / 180.0):
-            self.twist.linear.x = 0.0
-            self.twist.angular.z = self.angular_z
-            self.cmd_vel_pub.publish(self.twist)
+        angle = 0.0
+        while (1):
+            if angle < target_angle * math.pi / 180.0:
+                self.twist.linear.x = 0.0
+                self.twist.angular.z = self.angular_z
+                self.cmd_vel_pub.publish(self.twist)
+            else:
+                break
 
-            angle += self.twist.angular.z
             time.sleep(1)
         self.init_twist()
 
@@ -146,3 +152,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+    
