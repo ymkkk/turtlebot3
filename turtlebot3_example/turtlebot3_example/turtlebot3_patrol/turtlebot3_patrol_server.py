@@ -60,8 +60,8 @@ class Turtlebot3PatrolServer(Node):
         self.cmd_vel_pub.publish(self.twist)
 
     def go_front(self, position, length):
-        position = 0
         while(1):
+            position += self.twist.linear.x
             if position < length:
                 self.twist.linear.x = self.linear_x
                 self.twist.angular.z = 0.0
@@ -73,8 +73,8 @@ class Turtlebot3PatrolServer(Node):
         self.init_twist()
 
     def turn(self, angle, target_angle):
-        angle = 0.0
         while (1):
+            angle += self.twist.angular.z
             if angle < target_angle * math.pi / 180.0:
                 self.twist.linear.x = 0.0
                 self.twist.angular.z = self.angular_z
@@ -152,4 +152,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-    
