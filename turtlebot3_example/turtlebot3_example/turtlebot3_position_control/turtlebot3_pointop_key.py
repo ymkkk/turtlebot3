@@ -22,7 +22,7 @@ from rclpy.node import Node
 import numpy
 import math
 
-from geometry_msgs.msg import Twist, Point, Quaternion
+from geometry_msgs.msg import Twist, Point
 from nav_msgs.msg import Odometry
 
 
@@ -57,8 +57,6 @@ class Turtlebot3PointOpKey(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
     def timer_callback(self):
-        # self.get_logger().info('test')    
-
         self.position_error.x = self.goal_position.x - self.position.x
         self.position_error.y = self.goal_position.y - self.position.y
 
@@ -79,9 +77,8 @@ class Turtlebot3PointOpKey(Node):
             if self.cmd_vel.angular.z > 0:
                 self.cmd_vel.angular.z = min(self.cmd_vel.angular.z, 1.5)
             else:
-                self.cmd_vel.angular.z = max(self.cmd_vel.angular.z,  -1.5)
-            self.cmd_vel_pub.publish(self.cmd_vel)
-            
+                self.cmd_vel.angular.z = max(self.cmd_vel.angular.z, -1.5)
+            self.cmd_vel_pub.publish(self.cmd_vel)   
         else:
             self.heading_error = self.goal_heading - self.heading
 
@@ -96,63 +93,49 @@ class Turtlebot3PointOpKey(Node):
             if abs(self.heading_error * 180.0 / math.pi) < 1.0:
                 self.cmd_vel.linear.x = 0.0
                 self.cmd_vel.angular.z = 0.0
+                rclpy.shutdown()
                 
-        self.get_logger().info("distance: " + str(distance))
-        self.get_logger().info("heading_angle: " + str(self.heading_error * 180.0 / math.pi))
         self.cmd_vel_pub.publish(self.cmd_vel)
 
-    def get_odom(self, msg):
-        odom = msg        
+    def get_odom(self, msg):   
         self.position = msg.pose.pose.position
-        _, _, self.heading = self.euler_from_quaternion(msg.pose.pose.orientation)
-        # self.get_logger().info('heading: ' + str(self.heading))
+        _, _, self.heading = self.transfrom_from_quaternion_to_eular(msg.pose.pose.orientation)
         
     def get_key(self):
         self.goal_position.x = float(input("goal x: "))
         self.goal_position.y = float(input("goal y: "))
-        
         self.goal_heading = float(input("goal heading: "))
+
         if self.goal_heading >= math.pi:
             self.goal_heading = self.goal_heading % (math.pi * 180.0 / math.pi)
         elif self.goal_heading <= -math.pi:
             self.goal_heading = -(-self.goal_heading % (math.pi * 180.0 / math.pi))
-
         self.goal_heading = self.goal_heading * math.pi / 180.0
 
         self.get_logger().info(str(self.goal_position.x) + str(self.goal_position.y) + str(self.goal_heading))
 
-    def euler_from_quaternion(self, quat):
-        """
-        Convert quaternion (w in last place) to euler roll, pitch, yaw.
+    def transfrom_from_quaternion_to_eular(self, quaternion):
+        x = quaternion.x
+        y = quaternion.y
+        z = quaternion.z
+        w = quaternion.w
 
-        quat = [x, y, z, w]
-        """
-        x = quat.x
-        y = quat.y
-        z = quat.z
-        w = quat.w
-
-        sinr_cosp = 2 * (w * x + y * z)
-        cosr_cosp = 1 - 2 * (x * x + y * y)
+        sinr_cosp = 2.0 * (w * x + y * z)
+        cosr_cosp = 1.0 - 2.0 * (x * x + y * y)
         roll = numpy.arctan2(sinr_cosp, cosr_cosp)
 
-        sinp = 2 * (w * y - z * x)
+        sinp = 2.0 * (w * y - z * x)
         pitch = numpy.arcsin(sinp)
 
-        siny_cosp = 2 * (w * z + x * y)
-        cosy_cosp = 1 - 2 * (y * y + z * z)
+        siny_cosp = 2.0 * (w * z + x * y)
+        cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
         yaw = numpy.arctan2(siny_cosp, cosy_cosp)
 
         return roll, pitch, yaw
 
-
-
-
 def main(args=None):
     rclpy.init()
-
     turtlebot3_pointop_key = Turtlebot3PointOpKey()
-    
     rclpy.spin(turtlebot3_pointop_key)
 
     turtlebot3_pointop_key.destroy_node()
