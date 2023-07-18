@@ -347,9 +347,8 @@ void TurtleBot3::cmd_vel_callback()
       // ここから追加
 
       Serial serial;
-      // auto list = getSerialList();
-      // int port = 0;
-      if ("/dev/ttyACM1", 115200){
+
+      if (serial.open("/dev/ttyACM1", 115200)){
         RCLCPP_INFO(this->get_logger(), "Successfully open serial");
         // return -1; // return -1 をしたときにどうなるのか？？
       } else {
@@ -358,8 +357,8 @@ void TurtleBot3::cmd_vel_callback()
 
       float x_lim = 0.0;
       float y_lim = 0.0;
-      float linear_x = 0.1;
-      float angular_z = 0.1;
+      float linear_x = twist.msg->linear.x;
+      float angular_z = twist.msg->angular.z;
 
       if(linear_x > 1.0){
         x_lim = 1.0;
@@ -394,7 +393,6 @@ void TurtleBot3::cmd_vel_callback()
 
       unsigned char data_y = int_y;
       serial.write(&data_y, sizeof(data_y));
-      serial.close();
 
       //ここまで追加
 
