@@ -395,7 +395,6 @@ void TurtleBot3::cmd_vel_callback()
       unsigned char data_y = int_y;
       serial.write(&data_y, sizeof(data_y));
 
-
       //ここまで追加
 
       RCLCPP_DEBUG(
