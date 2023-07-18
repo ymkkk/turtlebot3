@@ -357,8 +357,8 @@ void TurtleBot3::cmd_vel_callback()
 
       float x_lim = 0.0;
       float y_lim = 0.0;
-      float linear_x = twist.msg->linear.x;
-      float angular_z = twist.msg->angular.z;
+      float linear_x = msg->twist.linear.x;
+      float angular_z = msg->twist.angular.z;
 
       if(linear_x > 1.0){
         x_lim = 1.0;
