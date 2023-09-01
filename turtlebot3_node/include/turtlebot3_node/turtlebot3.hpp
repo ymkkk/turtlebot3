@@ -60,6 +60,9 @@ extern const ControlTable extern_control_table;
 class TurtleBot3 : public rclcpp::Node
 {
 public:
+
+  Serial serial;
+  
   typedef struct
   {
     float separation;
@@ -114,8 +117,6 @@ private:
 
   rclcpp::AsyncParametersClient::SharedPtr priv_parameters_client_;
   rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub_;
-
-  Serial serial;
 };
 }  // namespace turtlebot3
 }  // namespace robotis
