@@ -92,7 +92,7 @@ private:
   void publish_timer(const std::chrono::milliseconds timeout);
   void heartbeat_timer(const std::chrono::milliseconds timeout);
 
-  void cmd_vel_callback(Serial & serial);
+  void cmd_vel_callback();
   void parameter_event_callback();
 
   Wheels wheels_;

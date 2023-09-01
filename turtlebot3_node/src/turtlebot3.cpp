@@ -218,7 +218,7 @@ void TurtleBot3::run()
   } else {
     RCLCPP_INFO(this->get_logger(), "Failed to open serial");
   }
-  cmd_vel_callback(serial);
+  cmd_vel_callback();
 }
 
 void TurtleBot3::publish_timer(const std::chrono::milliseconds timeout)
@@ -320,7 +320,7 @@ void TurtleBot3::parameter_event_callback()
   parameter_event_sub_ = priv_parameters_client_->on_parameter_event(param_event_callback);
 }
 
-void TurtleBot3::cmd_vel_callback(Serial & serial)
+void TurtleBot3::cmd_vel_callback()
 {
   auto qos = rclcpp::QoS(rclcpp::KeepLast(10));
   cmd_vel_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
@@ -384,14 +384,14 @@ void TurtleBot3::cmd_vel_callback(Serial & serial)
       
       RCLCPP_INFO(this->get_logger(),"int_x:%d",int_x);
       unsigned char data_x = int_x;
-      serial.write(&data_x, sizeof(data_x));
+      this->serial.write(&data_x, sizeof(data_x));
       
 
       int_y  = int_y + 63;
       RCLCPP_INFO(this->get_logger(),"int_y:%d",int_y);
 
       unsigned char data_y = int_y;
-      serial.write(&data_y, sizeof(data_y));
+      this->serial.write(&data_y, sizeof(data_y));
 
       //ここまで追加
 
