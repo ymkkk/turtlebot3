@@ -210,9 +210,8 @@ void TurtleBot3::run()
   heartbeat_timer(std::chrono::milliseconds(100));
 
   parameter_event_callback();
-  Serial serial;
 
-  if (serial.open("/dev/ttyACM1", 115200)){
+  if (this->serial.open("/dev/ttyACM1", 115200)){
     RCLCPP_INFO(this->get_logger(), "Successfully open serial");
     // return -1; // return -1 をしたときにどうなるのか？？
   } else {
