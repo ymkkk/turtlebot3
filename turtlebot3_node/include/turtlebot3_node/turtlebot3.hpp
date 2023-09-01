@@ -50,6 +50,8 @@
 #include "turtlebot3_node/sensors/sensor_state.hpp"
 #include "turtlebot3_node/sensors/sensors.hpp"
 
+#include "turtlebot3_node/Serial.hpp"
+
 namespace robotis
 {
 namespace turtlebot3
@@ -90,7 +92,7 @@ private:
   void publish_timer(const std::chrono::milliseconds timeout);
   void heartbeat_timer(const std::chrono::milliseconds timeout);
 
-  void cmd_vel_callback();
+  void cmd_vel_callback(const Serial & serial);
   void parameter_event_callback();
 
   Wheels wheels_;

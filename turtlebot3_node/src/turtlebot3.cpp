@@ -210,7 +210,15 @@ void TurtleBot3::run()
   heartbeat_timer(std::chrono::milliseconds(100));
 
   parameter_event_callback();
-  cmd_vel_callback();
+  Serial serial;
+
+  if (serial.open("/dev/ttyACM1", 115200)){
+    RCLCPP_INFO(this->get_logger(), "Successfully open serial");
+    // return -1; // return -1 をしたときにどうなるのか？？
+  } else {
+    RCLCPP_INFO(this->get_logger(), "Failed to open serial");
+  }
+  cmd_vel_callback(serial);
 }
 
 void TurtleBot3::publish_timer(const std::chrono::milliseconds timeout)
@@ -312,7 +320,7 @@ void TurtleBot3::parameter_event_callback()
   parameter_event_sub_ = priv_parameters_client_->on_parameter_event(param_event_callback);
 }
 
-void TurtleBot3::cmd_vel_callback()
+void TurtleBot3::cmd_vel_callback(Serial & serial)
 {
   auto qos = rclcpp::QoS(rclcpp::KeepLast(10));
   cmd_vel_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
@@ -345,15 +353,6 @@ void TurtleBot3::cmd_vel_callback()
       dxl_sdk_wrapper_->set_data_to_device(start_addr, addr_length, p_data, &sdk_msg);
 
       // ここから追加
-
-      Serial serial;
-
-      if (serial.open("/dev/ttyACM1", 115200)){
-        RCLCPP_INFO(this->get_logger(), "Successfully open serial");
-        // return -1; // return -1 をしたときにどうなるのか？？
-      } else {
-        RCLCPP_INFO(this->get_logger(), "Failed to open serial");
-      }
 
       float x_lim = 0.0;
       float y_lim = 0.0;
